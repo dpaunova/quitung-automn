@@ -14,3 +14,6 @@ Pillow==11.1.0
 pydantic[email-validator]==2.10.3
 pydantic-settings==2.7.0
 aiosmtplib==3.0.2
+bcrypt==4.2.1
+httpx2>=0.1.0
+pytest>=8.0
