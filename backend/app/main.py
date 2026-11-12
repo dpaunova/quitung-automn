@@ -66,23 +66,21 @@ def api_root():
     return {"status": "ok", "service": "Quitung Automn API"}
 
 
-app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
-app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
+if FRONTEND_DIR.is_dir():
+    app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
+    app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
 
+    @app.get("/manifest.json")
+    def manifest():
+        return FileResponse(FRONTEND_DIR / "manifest.json")
 
-@app.get("/manifest.json")
-def manifest():
-    return FileResponse(FRONTEND_DIR / "manifest.json")
+    @app.get("/sw.js")
+    def service_worker():
+        return FileResponse(FRONTEND_DIR / "sw.js", media_type="application/javascript")
 
-
-@app.get("/sw.js")
-def service_worker():
-    return FileResponse(FRONTEND_DIR / "sw.js", media_type="application/javascript")
-
-
-@app.get("/{full_path:path}")
-def serve_frontend(full_path: str):
-    file_path = FRONTEND_DIR / full_path
-    if file_path.is_file():
-        return FileResponse(file_path)
-    return FileResponse(FRONTEND_DIR / "index.html")
+    @app.get("/{full_path:path}")
+    def serve_frontend(full_path: str):
+        file_path = FRONTEND_DIR / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(FRONTEND_DIR / "index.html")
