@@ -27,16 +27,4 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: pip install -r requirements.txt
       - run: pip install pytest pytest-cov
-      - name: Debug - check imports
-        run: |
-          python -c "
-          import traceback, sys
-          try:
-              from app.main import app
-              print('app import OK')
-          except Exception:
-              traceback.print_exc()
-              sys.exit(1)
-          "
-          pip list | grep -iE "fastapi|starlette|httpx|uvicorn|sqlalchemy|bcrypt|passlib|reportlab|openpyxl|psycopg2|pydantic|jose|aiosmtplib"
       - run: pytest --cov=app --cov-report=term -v
