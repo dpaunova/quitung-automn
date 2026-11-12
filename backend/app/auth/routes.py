@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
-from app.auth.dependencies import require_admin, get_current_user
+from app.auth.dependencies import require_admin
 from app.auth.utils import (
     create_access_token,
     generate_verification_token,
@@ -18,6 +18,7 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 # ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
+
 
 class RegisterRequest(BaseModel):
     business_name: str
@@ -62,6 +63,7 @@ class MessageResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+
 
 @router.post("/register", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 def register(body: RegisterRequest, db: Session = Depends(get_db)):

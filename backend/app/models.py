@@ -1,12 +1,12 @@
 import datetime
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     DateTime,
     ForeignKey,
     Integer,
-    JSON,
     Numeric,
     String,
     Text,
@@ -26,9 +26,7 @@ class Business(Base):
     vat_number = Column(String(20), nullable=True)
     accountant_email = Column(String(255), nullable=True)
     accountant_name = Column(String(255), nullable=True)
-    created_at = Column(
-        DateTime, default=datetime.datetime.utcnow, server_default=func.now()
-    )
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, server_default=func.now())
 
     users = relationship("User", back_populates="business")
     receipts = relationship("Receipt", back_populates="business")
@@ -46,9 +44,7 @@ class User(Base):
     role = Column(String(20), nullable=False, default="staff")  # admin / staff
     email_verified = Column(Boolean, default=False)
     verification_token = Column(String(255), nullable=True)
-    created_at = Column(
-        DateTime, default=datetime.datetime.utcnow, server_default=func.now()
-    )
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, server_default=func.now())
 
     business = relationship("Business", back_populates="users")
     receipts = relationship("Receipt", back_populates="uploader")
@@ -62,9 +58,7 @@ class Receipt(Base):
     business_id = Column(Integer, ForeignKey("businesses.id"), nullable=False)
     uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     photo_path = Column(String(500), nullable=False)
-    status = Column(
-        String(20), nullable=False, default="processing"
-    )  # processing / done / failed
+    status = Column(String(20), nullable=False, default="processing")  # processing / done / failed
     receipt_date = Column(DateTime, nullable=True)
     total_amount = Column(Numeric(10, 2), nullable=True)
     vat_amount = Column(Numeric(10, 2), nullable=True)
@@ -73,9 +67,7 @@ class Receipt(Base):
     raw_ocr_text = Column(Text, nullable=True)
     field_confidence = Column(JSON, nullable=True)
     is_corrected = Column(Boolean, default=False)
-    created_at = Column(
-        DateTime, default=datetime.datetime.utcnow, server_default=func.now()
-    )
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, server_default=func.now())
 
     business = relationship("Business", back_populates="receipts")
     uploader = relationship("User", back_populates="receipts")

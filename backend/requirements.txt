@@ -17,3 +17,4 @@ aiosmtplib==3.0.2
 bcrypt==4.2.1
 httpx2>=0.1.0
 pytest>=8.0
+ruff>=0.17.0

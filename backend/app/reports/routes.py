@@ -7,9 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import mm
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from sqlalchemy import extract
 from sqlalchemy.orm import Session
 
@@ -25,6 +25,7 @@ router = APIRouter(prefix="/api/reports", tags=["reports"])
 # ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
+
 
 class PreviewOut(BaseModel):
     month: str
@@ -62,6 +63,7 @@ class SendResponse(BaseModel):
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _get_receipts_for_month(db: Session, business_id: int, month: str) -> list[Receipt]:
     """Fetch done receipts for a business in a given YYYY-MM month."""
     year, mon = month.split("-")
@@ -89,9 +91,7 @@ def _generate_pdf(receipts: list[Receipt], month: str, business: Business) -> st
     elements = []
 
     # Title
-    elements.append(
-        Paragraph(f"Belegbericht - {business.name} - {month}", styles["Title"])
-    )
+    elements.append(Paragraph(f"Belegbericht - {business.name} - {month}", styles["Title"]))
     elements.append(Spacer(1, 6 * mm))
 
     # Table header
@@ -106,28 +106,32 @@ def _generate_pdf(receipts: list[Receipt], month: str, business: Business) -> st
         netto = amount - vat
         total_sum += amount
         vat_sum += vat
-        table_data.append([
-            str(idx),
-            r.receipt_date.strftime("%d.%m.%Y") if r.receipt_date else "",
-            r.supplier_name or "",
-            f"{amount:.2f}",
-            f"{vat:.2f}",
-            f"{netto:.2f}",
-        ])
+        table_data.append(
+            [
+                str(idx),
+                r.receipt_date.strftime("%d.%m.%Y") if r.receipt_date else "",
+                r.supplier_name or "",
+                f"{amount:.2f}",
+                f"{vat:.2f}",
+                f"{netto:.2f}",
+            ]
+        )
 
     netto_sum = total_sum - vat_sum
     table_data.append(["", "", "Summe", f"{total_sum:.2f}", f"{vat_sum:.2f}", f"{netto_sum:.2f}"])
 
     table = Table(table_data, repeatRows=1)
     table.setStyle(
-        TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9E1F2")),
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ])
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D9E1F2")),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ]
+        )
     )
     elements.append(table)
 
@@ -138,6 +142,7 @@ def _generate_pdf(receipts: list[Receipt], month: str, business: Business) -> st
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+
 
 @router.get("/preview", response_model=PreviewOut)
 def preview_report(

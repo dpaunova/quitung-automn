@@ -27,4 +27,6 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: pip install -r requirements.txt
       - run: pip install pytest pytest-cov
+      - run: ruff check .
+      - run: ruff format --check .
       - run: pytest --cov=app --cov-report=term -v

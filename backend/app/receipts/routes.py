@@ -40,6 +40,7 @@ def _receipt_to_out(receipt: Receipt) -> ReceiptOut:
 # Endpoints
 # ---------------------------------------------------------------------------
 
+
 @router.post(
     "/",
     response_model=ReceiptUploadResponse,
@@ -65,7 +66,7 @@ def upload_receipt(
     if size > settings.MAX_UPLOAD_SIZE:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File exceeds maximum size of {settings.MAX_UPLOAD_SIZE // (1024*1024)} MB",
+            detail=f"File exceeds maximum size of {settings.MAX_UPLOAD_SIZE // (1024 * 1024)} MB",
         )
 
     # Save compressed image

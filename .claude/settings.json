@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(pytest:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(ruff check:*)",
+      "Bash(ruff format:*)",
+      "Bash(pip list:*)",
+      "Bash(pip show:*)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Read(.env*)",
+      "Read(**/secrets/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"import sys,json; d=json.load(sys.stdin); f=d.get('tool_response',{}).get('filePath') or d.get('tool_input',{}).get('file_path',''); print(f.strip())\" | tr -d '\\r' | { read -r f; case \"$f\" in *.py) ruff format --quiet \"$f\" && ruff check --fix --quiet \"$f\" ;; esac; } 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd backend && python -m pytest --tb=short -q > /tmp/pytest_out.txt 2>&1; rc=$?; cat /tmp/pytest_out.txt | python -c \"import sys; lines=sys.stdin.readlines(); [print(l,end='') for l in lines[-5:]]\"; if [ $rc -ne 0 ]; then echo '{\"continue\": false, \"stopReason\": \"Tests are failing. Fix them before finishing.\"}'; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

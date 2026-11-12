@@ -182,8 +182,7 @@ class VLMExtractor(Extractor):
             logger.info("PaddleOCR-VL model loaded successfully.")
         except Exception as exc:
             logger.warning(
-                "Could not load PaddleOCR-VL model (%s). "
-                "Falling back to MockExtractor.",
+                "Could not load PaddleOCR-VL model (%s). Falling back to MockExtractor.",
                 exc,
             )
             self._model = None

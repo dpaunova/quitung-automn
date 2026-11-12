@@ -15,7 +15,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from arq import cron  # type: ignore[import-untyped]
 from arq.connections import RedisSettings  # type: ignore[import-untyped]
 
 logger = logging.getLogger(__name__)
@@ -46,8 +45,7 @@ async def process_receipt(ctx: dict[str, Any], receipt_id: int) -> None:
         from app.models import Receipt  # type: ignore[import-untyped]
     except ImportError as exc:
         logger.error(
-            "Cannot import app.config or app.models -- is the app package "
-            "on the PYTHONPATH?  %s",
+            "Cannot import app.config or app.models -- is the app package on the PYTHONPATH?  %s",
             exc,
         )
         raise
@@ -96,9 +94,7 @@ async def process_receipt(ctx: dict[str, Any], receipt_id: int) -> None:
                 receipt.status = "failed"  # type: ignore[assignment]
                 session.commit()
         except Exception:
-            logger.exception(
-                "Could not set status=failed on receipt %d.", receipt_id
-            )
+            logger.exception("Could not set status=failed on receipt %d.", receipt_id)
         raise
     finally:
         session.close()
@@ -115,9 +111,11 @@ class WorkerSettings:
     def _build_redis_settings() -> RedisSettings:
         try:
             from app.config import settings as app_settings
+
             url = app_settings.REDIS_URL
             # Parse redis://host:port into RedisSettings
             from urllib.parse import urlparse
+
             parsed = urlparse(url)
             return RedisSettings(
                 host=parsed.hostname or "localhost",

@@ -102,9 +102,7 @@ def generate_excel(receipts: list[Receipt], month: str) -> str:
     # Auto-fit column widths (approximate)
     for col_idx in range(1, len(COLUMNS) + 1):
         col_letter = get_column_letter(col_idx)
-        ws.column_dimensions[col_letter].width = max(
-            len(COLUMNS[col_idx - 1]) + 4, 14
-        )
+        ws.column_dimensions[col_letter].width = max(len(COLUMNS[col_idx - 1]) + 4, 14)
 
     # Save file
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)

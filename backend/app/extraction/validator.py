@@ -80,6 +80,7 @@ def validate_receipt_fields(fields: dict[str, Any]) -> dict[str, Any]:
 
 # ── Individual rule implementations ──────────────────────────────────
 
+
 def _apply_penalty(confidence: dict[str, float], field: str, penalty: float) -> None:
     """Multiply the field's confidence by (1 - penalty)."""
     current = confidence.get(field, 1.0)
@@ -159,8 +160,7 @@ def _validate_mwst(
         if netto > 0:
             actual_rate = mwst / netto
             matches_any_rate = any(
-                abs(actual_rate - rate) <= _VAT_RATE_TOLERANCE
-                for rate in _VAT_RATES
+                abs(actual_rate - rate) <= _VAT_RATE_TOLERANCE for rate in _VAT_RATES
             )
             if not matches_any_rate:
                 _apply_penalty(confidence, "mwst", _PENALTY_MWST_IMPLAUSIBLE)
@@ -207,9 +207,7 @@ def _validate_lieferant(
     lieferant = str(fields.get("lieferant", "")).strip()
     if len(lieferant) < 2:
         _apply_penalty(confidence, "lieferant", _PENALTY_LIEFERANT_EMPTY)
-        issues.append(
-            f"lieferant: Name ist zu kurz oder leer ('{lieferant}')."
-        )
+        issues.append(f"lieferant: Name ist zu kurz oder leer ('{lieferant}').")
 
 
 def _validate_belegnummer(
@@ -220,6 +218,4 @@ def _validate_belegnummer(
     belegnummer = str(fields.get("belegnummer", "")).strip()
     if not re.search(r"\d", belegnummer):
         _apply_penalty(confidence, "belegnummer", _PENALTY_BELEGNUMMER_NO_DIGITS)
-        issues.append(
-            f"belegnummer: Enthält keine Ziffern ('{belegnummer}')."
-        )
+        issues.append(f"belegnummer: Enthält keine Ziffern ('{belegnummer}').")
